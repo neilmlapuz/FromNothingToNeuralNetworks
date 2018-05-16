@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset = "UTF-8"/>
+	<title> From Nothing to Neural Networks </title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+</head>
+<body>
+	<div id = "navBar">
+		<nav>
+			<img src="../static/img/FNNN_logo.png" class = "logo" alt="Web logo image" width="80" height="80">
+			<ul>
+				<li><a href="{{ url_for('index') }}">Home </a></li>
+				<li><a href="{{ url_for('Intro') }}">Intro </a></li>
+				<li><a href="{{ url_for('activation') }}">Activation</a></li>
+				<li><a href="{{ url_for('CNN') }}">CNN </a></li>
+				<li><a href="{{ url_for('CodeIt') }}">Code It </a></li>
+				<li><a href="{{ url_for('examineModel') }}"> Examine</a></li>
+			</ul>
+		</nav>
+	</div>
+				   
+				   
+		<div id = "page">
+			<p>In the previous section we had a look at what a perceptron looks like, how it receives inputs, applies a linear combination, and if that linear combination is greater than or less than some threshold, an output of 0 or 1 is produced respectively.  
+			In order to make things simpler for training purposes, a few changes need to be made to our perceptron. Firstly, the <dfn data-info="A value that has to be exceeded in order for a neuron to 'fire'">threshold</dfn> is normally moved to the other side of the inequality and renamed as the neuron’s 
+			<dfn data-info="A negative threshold">bias</dfn>, b ≡ − threshold.  Secondly, ∑i wi xi is generally rewritten as a dot product, 
+			w ⋅ x ≡∑i wi xi, where W and X are vectors comprised of weights and inputs respectively. These changes are illustrated below:</p>
+
+			<img src="../static/img/Output.png" class = "center" alt="output Threshold">
+
+			<p>The best way to think of the bias is how easy it is to get the neuron to output a 1. 
+			The bigger the bias, the easier it is for the neuron to output a 1 (fire if you will) , however, if the bias is very negative, 
+			then it is difficult for the perceptron to output a 1. 
+			The formula above is simply another way of describing the activation function we saw in the last section, the Heaviside step function:</p>
+				
+			<img src="../static/img/Heaviside.png" class = "center" alt="A diagram of the Heaviside step function">
+
+			<p>This is just one of several activation functions used in deep learning, it is also the simplest. 
+				Other activation functions include the Sigmoid, ReLu, Tanh, Linear, and  Softmax functions, each with their own specialised purpose. 
+				Given our current problem of  handwritten number recognition, suppose we have a network of perceptrons that we’d like to use in order to solve this problem. 
+				Ideally, we’d like the network to learn weights and biases so that the output from the network correctly classifies the input number. 
+				In order to make learning possible we’d like for some small change in either a weight or bias to cause only a small corresponding change in the final output. 
+				For example, suppose the network was mistakenly classifying an image of a  “7”  as a “1”. We could figure out how to make a small change in the weights and biases so that the network gets a little closer to classifying the image as a “7”. 
+				We would then repeat this over and over to produce an increasingly accurate output. This would be the network learning.</p>
+
+			<p>Unfortunately, this isn’t what happens when our network is composed of perceptrons. In fact, a small change to the weights or bias of any single perceptron can cause the output of that perceptron to completely flip, from 0 to 1 or vise versa. 
+				Such a flip may then cause the behaviour of the rest of the network to drastically change in a chaotic cascading manner. So while the “7” might now be classified correctly, all other inputs are likely to produce completely different results. 
+				As a result, it is difficult to see how we can gradually modify weights and biases to approach the desired behaviour. It turns out we can overcome this problem by simply modifying our perceptrons to create a new type of artificial neuron called a sigmoid neuron. The only difference between them is that a perceptron uses the Heaviside step function, whereas, a sigmoid neuron uses the Sigmoid function. So what’s the difference between the two activation functions? Simply put, the sigmoid function is a continuous function, 
+				allowing  inputs/outputs between 0 and 1, unlike the the Heaviside step function which only accepts 0 or 1.  Below is a Sigmoid function:</p>
+
+			<img src="../static/img/Sigmoid_function.png" class = "center" alt="A diagram of the Sigmoid function">
+
+			<p>What advantage does this continuity offer? Well for a start it means that the output can be considered as a probability of success, or a yes. 
+				For example, an output of 0.5 means the network “has no idea” whether it’s a yes or no, while an output of 0.8 means the network is “pretty sure” it’s a yes. 
+				As it turns out, this feature is particularly important if you want the network to be able to learn.</p>
+
+			<!-- Quiz functionality -->
+			<div id="quiz">Take the Activation Quiz or You Could Move On!</div>
+			<div id="panel">
+				<form>
+					<ul>
+						{% for query in lst_questionsKeys %}
+							<li><u>{{query}}</u></li>
+							{% for answers in questions[query] %}
+								<div id = "choices">
+									<input type="radio" value="{{answers}}" name="{{query}}" id=choice/>
+									{{answers}}
+								</div>
+							{% endfor %}
+						{% endfor %}
+					</ul>
+					<h2 id="QuizResult">Quiz Results</h2>	
+				</form>
+				<input type="button" id = "submit" value="Submit" />
+			</div>
+		</div>
+	</div>
+	<footer>
+		<p> &copy; 2018 All Rights Reserve </p>
+	</footer>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script type= "text/javascript"> 
+
+		document.getElementById("submit").addEventListener("click",function(){
+			//make the path of the script dynamic
+			//var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+			$.ajax({
+				type:"POST",
+				url: "/retrieveAnswers",
+				//encodes the set of form as a string
+				data: $("form").serialize(),
+				success: function(data){
+					$("#QuizResult").text(data);
+				}
+			});
+				
+		});
+	
+	</script>
+
+	<script type="text/javascript" src="{{url_for('static', filename='js/toggle_quiz.js')}}"></script>
+</body>
+</html>

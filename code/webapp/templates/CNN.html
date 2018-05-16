@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset = "UTF-8"/>
+	<title> From Nothing to Neural Networks </title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+</head>
+<body>
+	<div id = "navBar">
+		<nav>
+			<img src="../static/img/FNNN_logo.png" class = "logo" alt="Web logo image" width="80" height="80">
+			<ul>
+				<li><a href="{{ url_for('index') }}">Home </a></li>
+				<li><a href="{{ url_for('Intro') }}">Intro </a></li>
+				<li><a href="{{ url_for('activation') }}">Activation</a></li>
+				<li><a href="{{ url_for('CNN') }}">CNN </a></li>
+				<li><a href="{{ url_for('CodeIt') }}">Code It </a></li>
+				<li><a href="{{ url_for('examineModel') }}"> Examine</a></li>
+			</ul>
+		</nav>
+	</div>
+				   
+				   
+		<div id = "page">
+			<h1> Convolutional Network</h1>
+			<p>When it comes to image recognition and classification, Convolutional Neural Networks (CNN) have proven to be effective beyond explanation. They have been successful in identifying faces, animals,  and a plethora of other objects. As a result, they have been the main driving force in robotic vision and self driving cars. CNNs are biologically-inspired models, they are loosely based on a theory of how mammals see the world around them using clustered neurons to recognise different features of an object in a layered and hierarchical manner. The design of CNNs was inspired by three features from the aforementioned theory of mammalian vision</p>
+			<div id = "orderLstCNN">
+			<ol>
+				<li>Local Connections - Each set of neurons in a cluster are connected to each other</li>
+				<li>Layering - There is a hierarchy of features that are recognised</li>
+				<li>Spatial Invariance - No matter the orientation of an object, it can still be detected</li>
+			</ol>
+			</div>
+			<p>So how does it work?</p>
+			<img src="../static/img/Layers.png" class = "center" alt="Web image of layers" width="850">
+			<p>Well as you can see, there are layers. Each of these layers represent a set of operations that is performed (e.g convolution, max-pooling, normalisation). Given some stimulus, a 
+			<dfn data-info="a section of the image that is “focused” on">Receptive Field</dfn> is created and iteratively moved across the image until the entire image has been covered. The receptive field demarks a section of the image on which operations will be applied.</p>
+			<img src="../static/img/CNN_layers.png" class = "center" alt="Web image of CNN layers" width="850">
+			<p>A good way to think of of a CNN is to split it up into two parts Feature learning and Classification. For the feature learning part, three operations are applied over and over. These operations are; Convolution,
+				<dfn data-info="An Activation Function">ReLu</dfn>, and Pooling. Then once this is done, we move over to classification, where the output from the feature learning part is flattened into a smaller dimensional vector (flatten), then we connect all the neurons in one layer to the next (fully connected), and finally we squash our learnings into a set of probability values (softmax). The highest probability classification is the one that is chosen as the CNN’s “guess”.
+			<br>
+			In order to really get to grips with what is going in here we are going to break it down into eight steps:</p>
+			<div id = "orderLstCNN">
+			<ol>
+				<li>Preparation of images</li>
+				<li>Convolution</li>
+				<li>Normalisation (ReLu)</li>
+				<li>Pooling</li>
+				<li>Regularisation</li>
+				<li>Flatten and Connect</li>
+				<li>Probability conversion</li>
+				<li>Selecting the most likely label</li>
+			</ol>
+		</div>
+			
+			<h1>Step 1 - Preparation of images</h1>
+			<p>Essentially every image is  a <dfn data-info="A rectangular array of numbers arranged in rows and columns">matrix</dfn> of pixel values.</p>
+			<img src="../static/img/numberValue.gif" class = "numGif" alt="Web gif of a number value switching to pixels">
+			<p>The best way to think of an image, is as a 3D matrix [28,28,1] called the Input Volume. The first dimension is the length, the second is the width, and the third is the depth.  What is the depth you might be wondering? Well, the depth represent the number of <dfn data-info="Refers to the color component of an image">channels</dfn>  in the image.  Conventional coloured images have three channels - red, green, and blue (RGB), each having pixels whose intensity values lie in the range 0 to 255.
+			<br>
+			A greyscale image however, like the one above and the ones we’ll be using, has just one channel. This channel is simply for light intensity, with the value of each pixel lying in the range 0 to 255 - zero indicating black and 255 indicating white.
+			</p>
+	
+			<h1>Step 2 - Convolution</h1>
+			<p>What is convolution? The best way to think of convolution is like a mathematical operation not dissimilar to addition or multiplication. In essence, it is where two sources of information are combined into one using many <dfn data-info="An Operator that roduces a matrix from two matrices multiplied together">matrix multiplications</dfn> . The first source of information is the input image (Blue) and the second source of information is the Kernel (Yellow). The output of the convolution is generally called a Feature map (convolved feature).
+			</p>
+			<img src="../static/img/Convolution.gif" class = "center" alt="Web gif of a convoluion" width = "150">
+			<p>The actual combining of these two sources of information (convolution) is done by taking a section from the input image (receptive field) of equal dimension to that of the kernel (3 x 3), and performing a dot product operation on them. The result of this is one pixel of the feature map. Once a pixel has been computed, the center of the image section is shifted by some amount, called the “stride” value, and the computation is repeated. The computation ends once all pixels of the Feature map have been computed in this manner. This procedure is illustrated above.
+			</p>
+			
+			<img src="../static/img/featureMapCross.png" class = "center" alt="Web image of a feature map cross" width = "550">
+			<br>
+			<img src="../static/img/featureMapCross2.png" class = "center1" alt="Web image of a large pixel representation of receptive field" width = "250">
+			<img src="../static/img/featureMapCross3.png" class = "center2" alt="Web image of a small pixel representation of receptive field" width = "250">
+			<br>
+			<br>
+			<br>
+			<h1>Step 3 - Normalisation (ReLu in our case)</h1>
+			<p>Normalisation is done in order to enable the model to learn non-linear functions. ReLu, Rectified Linear units, simply turns all negative numbers into zero.</p>
+			<img src="../static/img/ReLu.png" class = "center" alt="Web image of a ReLu graph" width = "550">
+
+			
+			<h1>Step 4 -Pooling</h1>
+			<p>Pooling is simply a method for reducing the spatial dimensions (Width x Height) of the Input Volume. This is done to reduce computational complexity in the next Convolutional Layer.
+			The transformation is performed by either taking the maximum value from the <dfn data-info="a section of the image that is “focused” on">receptive field</dfn> (called “max pooling”), or by taking an average of those values (called “average pooling”). Max pooling is favoured simply because it produces better results.
+			</p>
+			<img src="../static/img/Pooling.png" class = "center" alt="Web image of pooling" width = "550">
+			<p>The colours show each time the receptive field has been applied on the image.</p>
+
+
+			<h1>Step 5 - Regularisation</h1>
+			<p>Regularisation refers to a broad range of techniques used in order to reduce overfitting. In oversimplified terms, overfitting is where your model has learned the characteristics and noise of the dataset it was trained on too intimately and as a result performs poorly at prediction and generalisation. Regularisation is an important step if we want our network to be able to accurately predict unseen data and be able to generalise beyond the data it has been trained on.
+			<br>
+			The regularisation technique we will use is called Dropout. It forces an artificial neural network to learn multiple independent representations of the same data by randomly disabling neurons in the learning phase. To perform Dropout on a layer, neurons on that layer are randomly set to zero during forward propagation.
+			</p>
+
+			<h1>Step 6 - Flatten and Connect</h1>
+			<p>
+			Once all the feature learning has been completed we “flatten” that output into a smaller dimensional vector, in order to make it more manageable, and then we apply a fully connected layer in which all neurons are connected to one another in order to harness all of the learnings that we have learned so far. 
+			The fully connected layer is important in order to get a better sense of the image as a whole as it combines all of the learned features into one, thus allowing us to classify the image based on the combination of our learned features.
+			</p>
+			<img src="../static/img/Flatten.png" class = "center" alt="Web image of flattening" width = "550">
+
+			<h1>Step 7 - Probability Conversion</h1>
+			<p>
+			In the final layer of our network, in order to convert the outputs into probabilities, we apply something called a Regression. One of two types of regression is used depending on the type of classification we want to perform. 
+			Logistic Regression is used for binary classification tasks (involving two groups) and Softmax Regression, the one we’ll use, for multi-class classification.
+			</p>
+			<img src="../static/img/Softmax.png" class = "center" alt="Web image of softmax diagram" width = "550">
+
+			
+			<h1>Step 8 - Choosing the most likely label</h1>
+			<p>This step is the easiest step, we simply pick the label with the highest probability.</p>
+		
+			<h1>How does this network learn?</h1>
+		
+			<p>Imagine we pass an image of an eight through the network for the very first time and it produces a set of predictions. How can we gauge how good its prediction is?  We do this by taking the output it produced and the output you wanted it to produce, 
+			and you calculate the squares of the differences between each component, this is called the <strong> cost</strong>. 
+			Calculating the cost of each of your thousands of training examples, summing them up and calculating the mean will give you the <strong> total cost</strong> of the network and is normally referred to as the <strong> cost function (loss function)</strong>. 
+			The goal is to minimise our cost function. We do this by computing the negative <dfn data-info="Defines on how you get from one point to another">gradient</dfn> of our cost function and following it to the point where the cost is a minimum. <strong> Backpropagation</strong> is what we use to calculate the gradient of our cost function and it uses <strong> Gradient Descent</strong> in order to update our weights as we follow the negative gradient towards our minimum. 
+			There are three main variations of gradient descent:</p>
+			<div id = "unorderLst">
+			<ul>
+				<li><strong>Batch Gradient Descent: </strong> Uses the cost function of entire training data set to make one update.</li>
+				<li><strong>Stochastic Gradient Descent:</strong> Performs a parameter update for each training example.</li>
+				<li><strong>Mini-batch Gradient Descent:</strong>  Performs a parameter update for every mini-batch of <strong>n</strong> training examples.</li>
+			</ul>
+			</div>
+			<p>Below is a simple representation of gradient descent.</p>
+			<img src="../static/img/gradientdescent.png" class = "center" alt="Web image of gradient descent diagram" width = "550">
+			<p>Now we have covered the underlying conceptual elements relating to the structure and function of a Convolutional Neural Network, we
+				will tie things off by covering some revelant codes and snippets.
+			</p>
+
+			
+			<!-- Quiz functionality -->
+			<div id="quiz">Take the CNN Quiz or You Could Move On!</div>
+			<div id="panel">
+				<form>
+					<ul>
+						{% for query in lst_questionsKeys %}
+							<li><u>{{query}}</u></li>
+							{% for answers in questions[query] %}
+								<div id = "choices">
+									<input type="radio" value="{{answers}}" name="{{query}}" id=choice/>
+									{{answers}}
+								</div>
+							{% endfor %}
+						{% endfor %}
+					</ul>
+					<h2 id="QuizResult">Quiz Results</h2>	
+				</form>
+				<input type="button" id = "submit" value="Submit" />
+			</div>
+		</div>
+	<footer>
+		<p> &copy; 2018 All Rights Reserve </p>
+	</footer>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script type= "text/javascript"> 
+
+		document.getElementById("submit").addEventListener("click",function(){
+			//make the path of the script dynamic
+			//var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+			$.ajax({
+				type:"POST",
+				url: "/retrieveAnswers",
+				//encodes the set of form as a string
+				data: $("form").serialize(),
+				success: function(data){
+					$("#QuizResult").text(data);
+				}
+			});
+				
+		});
+	
+	</script>
+
+	<script type="text/javascript" src="{{url_for('static', filename='js/toggle_quiz.js')}}"></script>
+</body>
+</html>

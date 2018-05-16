@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset = "UTF-8"/>
+	<title> From Nothing to Neural Networks </title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+</head>
+<body>
+	<div id = "navBar">
+		<nav>
+			<img src="../static/img/FNNN_logo.png" class = "logo" alt="Web logo image" width="80" height="80">
+			<ul>
+				<li><a href="{{ url_for('index') }}">Home </a></li>
+				<li><a href="{{ url_for('Intro') }}">Intro </a></li>
+				<li><a href="{{ url_for('activation') }}">Activation</a></li>
+				<li><a href="{{ url_for('CNN') }}">CNN </a></li>
+				<li><a href="{{ url_for('CodeIt') }}">Code It </a></li>
+				<li><a href="{{ url_for('examineModel') }}">Examine</a></li>
+			</ul>
+		</nav>
+	</div>			   
+	<div id = "page">
+			<p>Now that we’ve conceptually covered the steps involved in a Convolutional Neural Network, let’s take a look at some code. 
+			To keep things nice and simple we’ll follow the same logic as the previous section and keep our code simple by making use of Keras.</p>
+			<h1>Step - 1 Preparation of images</h1>	   
+			<p id = "imagePrep">
+			<span class  = "comment"># Here we are simply loading in our test data that we will get from the MNIST database.</span>
+			<br>
+			<span class = "code">(x_train, y_train), (x_test, y_test) = mnist.load_data()</span>
+			</p>
+
+			<p id = "imagePrep">
+			<span class  = "comment"># First we want to reshapes our data so we can feed it into our network.</span>
+			<br>
+			<span class  = "comment"># 1x28x28 are the dimensions we want, 1 for greyscale 28 pixels for the height and width, with a maximum bit size of 32.</span>
+			<br>
+			<span class = "code">x_train = x_train.reshape(x_train.shape[0], 1, 28, 28).astype('float32')</span>
+			<br>
+			<span class = "code">x_test = x_test.reshape(x_test.shape[0], 1, 28, 28).astype('float32')</span>
+			</p>
+
+			<p id = "imagePrep">
+			<span class = "comment"># Here we simply convert the pixel values that are in the range 0-255 into floating point numbers in the range 0-1.</span>
+			<br>
+			<span class = "code">x_train = x_train / 255</span>
+			<br>
+			<span class = "code">x_test = x_test / 255</span>
+			</p>
+
+			<p id = "imagePrep">
+			<span class = "comment"># This simply converts our labels into binary class matrices, with classes from 0-9.</span>
+			<br>
+			<span class = "code">num_classes = 10</span>
+			<br>
+			<span class = "code">y_train = np_utils.to_categorical(y_train, num_classes)</span>
+			<br>
+			<span class = "code">y_test = np_utils.to_categorical(y_test, num_classes)</span>
+			</p>
+			<h1>Step - 2 Convolution + Step - 3 Normalisation</h1>	   
+			<p id = "convNorm">
+			<span class = "comment"># Next we perform both Convolution and subsequently apply the ReLu activation function in order to get our Feature Maps.</span>
+			<br>
+			<span class = "code">model.add(Conv2D(32,(5,5), input_shape = (1,28,28),activation='relu'))</span>
+			</p>
+			<h1>Step - 4 Pooling</h1>	   
+			<p id = "pooling">
+			<span class = "comment"># The size of the matrix is reduced to 2x2 and the most intense pixels are selected.</span>
+			<br>
+			<span class = "code">model.add(MaxPooling2D(pool_size=(2,2)))</span>
+			</p>
+			<h1>Step 5 - Regularisation </h1>	   
+			<p id = "reg">
+			<span class = "comment"># We use Dropout to randomly turn neurons “off” in order to prevent overfitting. Each neuron has a 0.25 probability of being turned “off”.</span>
+			<br>
+			<span class = "code">model.add(Dropout(0.25))</span>
+			</p>
+			<h1>Step 6 - Flatten and Connect </h1>	   
+			<p id = "flatten">
+			<span class = "comment"># Here we convert output into a smaller dimensional vector (flatten), then we connect all the neurons in one layer to the next (fully connected)</span>
+			<br>
+			<span class = "code">model.add(Flatten())</span>
+			<br>
+			<span class = "code">model.add(Dense(128,activation='relu'))</span>
+			<br>
+			<span class = "code">model.add(Dense(50,activation='relu'))</span>
+			</p>
+			<h1>Step - 7 Probability Conversion</h1>	   
+			<p id = "softmax">
+			<span class = "comment"># use softmax function to squash matrix to output probability value</span>
+			<br>
+			<span class = "comment"># determines which class does it belong to</span>
+			<br>
+			<span class = "code">model.add(Dense(num_classes,activation='softmax'))</span>
+			</p>
+			<h1>Compile!</h1>
+			<p id = "compile">
+			<span class = "comment"># This is where we build the model and train it by back propagating through it using cross entropy to calculate our cost/loss and Stochastic Gradient Descent with ADAM as the optimisation algorithm to calculate our updated weights.</span>
+			<br>
+			<span class = "code">model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])</span>
+			</p>
+
+			<p>In the next section you’ll be able to train a model and see how various hyperparameters effect the performance of said model.</p>
+
+			
+	</div>
+	<footer>
+		<p> &copy; 2018 All Rights Reserve </p>
+	</footer>
+</body>
+</html>

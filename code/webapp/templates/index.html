@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset = "UTF-8"/>
+	<title> From Nothing to Neural Networks </title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+</head>
+<body>
+	<div id = "navBar">
+		<nav>
+			<img src="../static/img/FNNN_logo.png" class = "logo" alt="Web logo image" width="80" height="80">
+			<ul>
+				<li><a href="{{ url_for('index') }}">Home </a></li>
+				<li><a href="{{ url_for('Intro') }}">Intro </a></li>
+				<li><a href="{{ url_for('activation') }}">Activation</a></li>
+				<li><a href="{{ url_for('CNN') }}">CNN </a></li>
+				<li><a href="{{ url_for('CodeIt') }}">Code It </a></li>
+				<li><a href="{{ url_for('examineModel') }}">Examine</a></li>
+			</ul>
+		</nav>
+	</div>
+	
+		<div id= "subSect">
+			<div id="particles"></div>
+
+			<div class="main1">
+				<h1>From Nothing to Neural Networks</h1>
+		    </div>
+		</div>
+				   
+				   
+		<div id = "page">
+			<p>This website is primarly intended as a medium to showcase the knowledge acquired by Lorin Sweeney and Neil Lapuz for their third year project. 
+				The secondary objective of the website is to act as a neural network learning tool for those that wish to enlighten themselves on the subject.</p>
+				<p>To get an idea of the sort of thing you can do with a neural network, below is canvas linked up to a Convolutional Neural Network  that can recognise hand-written numbers from 0-9. All you have to do is left-click and drag on the canvas to draw your desired number and then press submit and the network will return its prediction. 
+				If you want to try another number, all you have to do is clear the canvas and repeat the steps.</p>
+				 <center>
+					<div class = "ONR">
+						<div id = "canvas">
+							<canvas id = "canv" width="280" height="280"></canvas>
+						</div>
+						
+						<h2 id="predictionResult">RESULT</h2>
+						<div class="loader" style ="display:none;"> 
+							<div id = "text">
+								<p>PREDICTING</p>
+							</div>
+							<div id = "loadingBar"></div>
+						</div>
+						<div id="buttons">
+						  <input type="button" id="clear" value="Clear">
+						  <input type="button" id="submit" value="Submit">
+    					</div>
+					</div>
+				 </center>		    
+		</div>
+
+	<footer>
+		<p> &copy; 2018 All Rights Reserve </p>
+	</footer>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script type= "text/javascript">
+
+	document.getElementById("submit").addEventListener("click",function(){
+	var canvas = document.getElementById("canv");
+	var img = canvas.toDataURL();
+		if(drawn == false){
+			alert("The canvas is blank -- Please draw a number")
+		}
+		else{
+			$("#predictionResult").hide();
+			$(".loader").show();
+			//make the path of the script dynamic
+			//var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+			$.ajax({
+				type:"POST",
+				url: "/submit/",
+				data:img,
+				success: function(data){
+						//once the data has been received, hide the loader and show the result
+						$(".loader").hide()
+						$("#predictionResult").show();
+						$("#predictionResult").text(data);
+				}
+			});
+		}
+	});
+	
+	</script>
+	<script type='text/javascript' src='static/js/jquery.particleground.js'></script>
+	<script type='text/javascript' src='static/js/particleground.js'></script>
+	<script type="text/javascript" src="{{url_for('static', filename='js/draw.js')}}"></script>
+</body>
+</html>

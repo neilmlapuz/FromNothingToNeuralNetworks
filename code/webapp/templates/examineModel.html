@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset = "UTF-8"/>
+	<title> From Nothing to Neural Networks </title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+	<div id = "navBar">
+		<nav>
+			<img src="../static/img/FNNN_logo.png" class = "logo" alt="Web logo image" width="80" height="80">
+			<ul>
+				<li><a href="{{ url_for('index') }}">Home </a></li>
+				<li><a href="{{ url_for('Intro') }}">Intro </a></li>
+				<li><a href="{{ url_for('activation') }}">Activation</a></li>
+				<li><a href="{{ url_for('CNN') }}">CNN </a></li>
+				<li><a href="{{ url_for('CodeIt') }}">Code It </a></li>
+				<li><a href="{{ url_for('examineModel') }}"> Examine</a></li>
+			</ul>
+		</nav>
+	</div>
+				   	   
+		<div id = "page">
+			<p>Before you play around with the model we should cover some necessary knowledge in order to fully understand what’s going on.</p>
+            <div id = "unorderLst">
+					<ul>
+						<li><strong>Data Size: </strong> The number of unique images that the model will be trained on.</li>
+						<li><strong>Activation Function: </strong> You can pick between the previously covered Sigmoid and ReLu functions.</li>
+						<li><strong>Regularisation (Drop Out): </strong> As mentioned before, this is a method for reducing overfitting, the probability that each neuron has to be turned off can be altered.</li>
+						<li><strong>Epoch: </strong> A measure of the number of times a set of training images is used to update the weights.</li>
+						<li><strong>Batch Size: </strong> The number of images that the model will use for training during each Epoch.</li>
+					</ul>
+			</div>
+			<p>Finally, once all the parameters have been set, and the model has been trained, we need to be able to interpret the results. 
+			There are four metrics presented in the results:</p>
+			<div id = "unorderLst">
+					<ul>
+						<li><strong>Loss (cost): </strong> As we mentioned before, it is the summation of the errors in the output with respect to the correctly labeled training example. N.B this is something we want to reduce.</li>
+						<li><strong>Val_loss: </strong> It is the summation of the errors in the output with respect to the correctly labeled validation training example. N.B this is something we want to reduce.</li>
+						<li><strong>Acc: </strong> This is simply the percentage of results that produced the correct output for the training data. N.B this is something we want to increase, but not have at 100% as this is an indication of overfitting.</li>
+						<li><strong>Val_acc: </strong> This is the same as Acc except for the validation training data.</li>
+					</ul>
+			</div>
+			<p>There are two main things to look out for:</p>
+			<div id = "orderLst">
+					<ol>
+						<li><strong>Overfitting: </strong>Where the model’s accuracy is too high, indicating that the model won’t generalise well.</li>
+						<li><strong>Underfitting: </strong>Where the model’s loss is high and it’s accuracy is low, indicating that the model has simply not learned any features of the data. </li>
+					</ol>
+			</div>
+			<div id="panel1">
+				<form>
+					<h2 id = "examine">Data Size</h2>
+					<select name="dataSize">
+						<option value="10">10</option>
+						<option value="100">100</option>
+						<option value="1000">1000</option>
+						<option value="12000">12000</option>
+					</select>
+					<br>
+					<h2 id = "examine">Activation Function</h2>
+					<select name="activation">
+						<option value="relu">Relu</option>
+						<option value="sigmoid">Sigmoid</option>
+					</select>
+					<br>
+					<h2 id = "examine">Regularisation (Dropout)</h2>
+					<select name="regularisation">
+						<option value="0">0</option>
+						<option value="0.25">0.25</option>
+						<option value="0.5">0.5</option>
+						<option value="0.75">0.75</option>
+						<option value="1">1.0</option>
+					</select>
+					<br>
+					<h2 id ="examine">Epoch</h2>
+					<select name="epoch">
+						<option value="5">5</option>
+						<option value="10">10</option>
+						<option value="30">30</option>
+						<option value="50">50</option>
+					</select>
+					<br>
+					<h2 id = "examine">Batch Size</h2>
+					<select name="batchSize">
+						<option value="25">25</option>
+						<option value="80">80</option>
+						<option value="130">130</option>
+						<option value="250">250</option>
+					</select>
+				  </form>
+				  <br>
+				  <h2 id="modelResult">Model Result</h2>
+				  <div class="loader" style ="display:none;"> 
+					<div id = "text">
+						<p>Training</p>
+					</div>
+					<div id = "loadingBar"></div>
+				</div>
+				<br> 
+				<center><canvas id ="line-chart" width="1200" height="400" ></canvas></center>
+				<br>
+				<input type="button" id = "train" value="Submit" />
+			</div>
+		</div>
+	<footer>
+		<p> &copy; 2018 All Rights Reserve </p>
+	</footer>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+	<script type= "text/javascript"> 
+
+		document.getElementById("train").addEventListener("click",function(){
+			//make the path of the script dynamic
+			//var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+			$("#modelResult").hide();
+			$(".loader").show();
+			$.ajax({
+				type:"POST",
+				url: "/train",
+				//encodes the set of form as a string
+				data: $("form").serialize(),
+				success:function(data){
+					//once the data has been received, hide the loader and show the result
+					$(".loader").hide()
+					$("#modelResult").show();
+					$("#modelResult").text(data.result);
+					updateChart(data.result_model);
+				}
+			});
+				
+		});
+	</script>
+	<script type="text/javascript" src="{{url_for('static', filename='js/makeChart.js')}}"></script>
+
+</body>
+</html>
